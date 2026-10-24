@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agora — Class XI Humanities Assessment Archive</title>
+  <!-- Editorial Serif (Newsreader) + Clean UI Sans (Plus Jakarta Sans) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      /* Light Mode — Warm Archival Editorial Palette */
+      --bg-primary: #F9F8F5;
+      --bg-secondary: #FFFFFF;
+      --bg-subtle: #F2EFE9;
+      --text-primary: #1C1E21;
+      --text-secondary: #4A4D52;
+      --text-muted: #76746E;
+      --border-color: #E4E0D8;
+      --border-strong: #C9C4B8;
+      
+      /* Academic Accent — Deep Terracotta / Oxblood */
+      --accent-primary: #8C2D19;
+      --accent-hover: #6E2010;
+      --accent-soft: #F7ECE9;
+
+      /* Subtle Disciplinary Tones */
+      --tone-ochre: #8A5A1E;
+      --tone-navy: #1E3A5F;
+      --tone-forest: #234E3C;
+      --tone-plum: #5C2D50;
+      --tone-slate: #364958;
+      --tone-teal: #1D5257;
+      --tone-crimson: #7A2323;
+
+      --shadow-sm: 0 1px 3px rgba(28, 30, 33, 0.04);
+      --shadow-hover: 0 10px 24px -6px rgba(28, 30, 33, 0.08);
+      --radius-md: 8px;
+      --radius-sm: 6px;
+      --radius-pill: 999px;
+      --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    [data-theme="dark"] {
+      /* Dark Mode — Warm Library Study Palette */
+      --bg-primary: #141413;
+      --bg-secondary: #1C1C1A;
+      --bg-subtle: #252422;
+      --text-primary: #ECE8E1;
+      --text-secondary: #B0ABA2;
+      --text-muted: #7D786F;
+      --border-color: #2E2D2A;
+      --border-strong: #42403B;
+      
+      --accent-primary: #D97757;
+      --accent-hover: #E58D70;
+      --accent-soft: rgba(217, 119, 87, 0.14);
+
+      --tone-ochre: #D4A359;
+      --tone-navy: #7FA3C9;
+      --tone-forest: #6BA88B;
+      --tone-plum: #C285B3;
+      --tone-slate: #94A9B8;
+      --tone-teal: #6BB0B5;
+      --tone-crimson: #D97E7E;
+
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
+      --shadow-hover: 0 12px 28px -8px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* Top Navigation */
+    .navbar {
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 1.5rem;
+    }
+
+    .nav-container {
+      max-width: 1160px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .brand-title {
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-divider {
+      color: var(--border-strong);
+      font-weight: 300;
+    }
+
+    .brand-subtitle {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .theme-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 0.45rem 0.85rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .theme-btn:hover {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+      background: var(--bg-subtle);
+    }
+
+    /* Editorial Masthead */
+    .masthead {
+      max-width: 1160px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2.75rem 1.5rem 2rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .masthead-copy {
+      max-width: 640px;
+    }
+
+    .masthead-kicker {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .masthead h1 {
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: clamp(2rem, 4vw, 2.75rem);
+      font-weight: 500;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.65rem;
+      color: var(--text-primary);
+    }
+
+    .masthead p {
+      color: var(--text-secondary);
+      font-size: 0.98rem;
+      line-height: 1.55;
+    }
+
+    .masthead-meta {
+      display: flex;
+      gap: 1.75rem;
+      padding-bottom: 0.2rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .meta-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .meta-stat strong {
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
+
+    /* Unified Control Bar */
+    .control-bar-wrapper {
+      max-width: 1160px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .control-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.6rem 0.75rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .filter-pill {
+      padding: 0.42rem 0.8rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .filter-pill svg {
+      opacity: 0.7;
+      transition: var(--transition);
+    }
+
+    .filter-pill:hover {
+      color: var(--text-primary);
+      background: var(--bg-subtle);
+    }
+
+    .filter-pill.active {
+      background: var(--text-primary);
+      color: var(--bg-primary);
+      font-weight: 600;
+    }
+
+    .filter-pill.active svg {
+      opacity: 1;
+    }
+
+    .search-wrapper {
+      position: relative;
+      min-width: 260px;
+      flex: 0 1 300px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.48rem 0.85rem 0.48rem 2.25rem;
+      font-family: inherit;
+      font-size: 0.83rem;
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+      outline: none;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-input:focus {
+      border-color: var(--text-primary);
+      background: var(--bg-secondary);
+    }
+
+    /* Main Archive Content & Two-Tier Disciplinary Sections */
+    .main-content {
+      max-width: 1160px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0.5rem 1.5rem 4rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+
+    .discipline-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+    }
+
+    .section-title {
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    .section-count {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* 3-Column Balanced Grid for Social Sciences (6 cards = 3x2) */
+    .exam-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+
+    /* Exam Card — Editorial & Uncluttered */
+    .exam-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.4rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+
+    .exam-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+      border-color: var(--border-strong);
+    }
+
+    /* Full-Width Featured/Language Banner Card (Solves 7th-card orphan) */
+    .exam-card.card-featured {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 2rem;
+      padding: 1.6rem 1.75rem;
+      background: linear-gradient(to right, var(--bg-secondary), var(--bg-subtle));
+    }
+
+    .card-featured .card-body {
+      max-width: 680px;
+    }
+
+    .card-featured .card-desc {
+      margin-bottom: 0.65rem;
+    }
+
+    .card-featured .card-footer {
+      border-top: none;
+      padding-top: 0;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 0.85rem;
+      min-width: 240px;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .subject-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.74rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--subject-tone, var(--accent-primary));
+    }
+
+    .subject-label svg {
+      stroke: var(--subject-tone, var(--accent-primary));
+    }
+
+    .exam-code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.73rem;
+      color: var(--text-muted);
+      background: var(--bg-subtle);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+    }
+
+    .card-title {
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 0.45rem;
+      line-height: 1.28;
+    }
+
+    .card-desc {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 1.35rem;
+      line-height: 1.55;
+    }
+
+    .card-footer {
+      border-top: 1px solid var(--border-color);
+      padding-top: 1rem;
+      display: flex;
+       flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    /* Clean Understated Metadata Row */
+    .card-meta {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .meta-dot {
+      color: var(--border-strong);
+    }
+
+    /* Streamlined Actions: Primary CTA + Subtle Icon Button for PDF */
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+    }
+
+    .btn-primary {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.58rem 1rem;
+      border-radius: var(--radius-sm);
+      background: var(--text-primary);
+      color: var(--bg-primary);
+      border: 1px solid var(--text-primary);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: #FFFFFF;
+    }
+
+    .btn-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      text-decoration: none;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .btn-icon:hover {
+      border-color: var(--text-primary);
+      color: var(--text-primary);
+      background: var(--bg-subtle);
+    }
+
+    .btn-disabled {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 3.5rem 1.5rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+    }
+
+    .empty-state h3 {
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 1.3rem;
+      font-weight: 500;
+      margin-bottom: 0.35rem;
+    }
+
+    .empty-state p {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+
+    /* Institutional Footer */
+    footer {
+      border-top: 1px solid var(--border-color);
+      padding: 1.75rem 1.5rem;
+      background: var(--bg-primary);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .footer-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    @media (max-width: 960px) {
+      .exam-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .exam-card.card-featured {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      .card-featured .card-footer {
+        border-top: 1px solid var(--border-color);
+        padding-top: 1rem;
+        align-items: stretch;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .masthead {
+        padding: 2rem 1.25rem 1.5rem;
+      }
+      .control-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .search-wrapper {
+        flex: 1 1 auto;
+      }
+      .exam-grid {
+        grid-template-columns: 1fr;
+      }
+      .brand-subtitle {
+        display: none;
+      }
+      .brand-divider {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="brand">
+        <span class="brand-title">Agora</span>
+        <span class="brand-divider">/</span>
+        <span class="brand-subtitle">Class XI Humanities Archive</span>
+      </a>
+      <button class="theme-btn" id="themeToggle" aria-label="Toggle color theme">
+        <span id="themeIcon" style="display:inline-flex;align-items:center;"></span>
+        <span id="themeText">Dark Theme</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Restrained Editorial Masthead -->
+  <header class="masthead">
+    <div class="masthead-copy">
+      <div class="masthead-kicker">Academic Assessment Repository</div>
+      <h1>Class XI Humanities Examinations</h1>
+      <p>
+        Select a paper below to begin a timed browser assessment or download the typeset question paper in PDF format for offline practice.
+      </p>
+    </div>
+    <div class="masthead-meta">
+      <div class="meta-stat">
+        <strong id="totalExamsCount">7</strong>
+        <span>Examination Papers</span>
+      </div>
+      <div class="meta-stat">
+        <strong id="totalSubjectsCount">7</strong>
+        <span>Core Disciplines</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Cohesive Control Bar: Filter Pills + Search -->
+  <section class="control-bar-wrapper" aria-label="Filter and search examinations">
+    <div class="control-bar">
+      <div class="filter-pills" id="subjectFilters">
+        <!-- Populated via JavaScript -->
+      </div>
+      <div class="search-wrapper">
+        <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input 
+          type="text" 
+          id="searchInput" 
+          class="search-input" 
+          placeholder="Filter by topic, title, or code..."
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Two-Tier Disciplinary Archive -->
+  <main class="main-content" id="archiveContainer">
+    <!-- Populated via JavaScript -->
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <span>Agora Assessment Archive · Senior Secondary Humanities Curriculum (Class XI)</span>
+      <span>Interactive Browser Evaluations &amp; Printable Question Papers</span>
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       EXAM CONFIGURATION & SCRIPT
+  ========================================================================== -->
+  <script>
+    const EXAMS_DATA = [
+      {
+        id: "HIST-01",
+        subject: "History",
+        category: "Social Sciences & Human Inquiry",
+        title: "Writing and City Life",
+        description: "Mesopotamian civilization, early urbanization, temple architecture, and the evolution of cuneiform script.",
+        duration: "90 mins",
+        marks: "40 marks",
+        date: "Unit Test 1",
+        htmlFile: "exams/history-test-1.html",
+        pdfLink: "https://example.com/download/history-unit-1-pdf"
+      },
+      {
+        id: "POL-01_02",
+        subject: "Political Science",
+        category: "Social Sciences & Human Inquiry",
+        title: "Constitution: Why and How?, Rights in Constitution",
+        description: "Constituent Assembly debates, fundamental rights, institutional balance, and constitutional morality.",
+        duration: "2.5 hours",
+        marks: "70 marks",
+        date: "Oct 24, 2026",
+        htmlFile: "exams/polsci-1,2.html",
+        pdfLink: "https://schoolchan.onrender.com/thread/18#p268"
+      },
+      {
+        id: "GEO-01",
+        subject: "Geography",
+        category: "Social Sciences & Human Inquiry",
+        title: "Interior of the Earth & Landforms",
+        description: "Seismic waves, continental drift theory, plate tectonics, and geomorphic processes.",
+        duration: "120 mins",
+        marks: "70 marks",
+        date: "Mid-Term",
+        htmlFile: "exams/geography-midterm.html",
+        pdfLink: "https://example.com/download/geo-midterm-unique-link"
+      },
+      {
+        id: "SOC-01",
+        subject: "Sociology",
+        category: "Social Sciences & Human Inquiry",
+        title: "Sociology and Society",
+        description: "Sociological imagination, plurality of perspectives, and relationship with other social sciences.",
+        duration: "60 mins",
+        marks: "30 marks",
+        date: "Chapter Test",
+        htmlFile: "exams/sociology-ch1.html",
+        pdfLink: "https://example.com/download/sociology-paper-1"
+      },
+      {
+        id: "PSY-01",
+        subject: "Psychology",
+        category: "Social Sciences & Human Inquiry",
+        title: "What is Psychology & Enquiry Methods",
+        description: "Evolution of modern psychology, experimental vs. observational methods, and ethical guidelines.",
+        duration: "90 mins",
+        marks: "50 marks",
+        date: "Unit Test 2",
+        htmlFile: "exams/psychology-test-1.html",
+        pdfLink: "https://example.com/download/psych-enquiry-pdf"
+      },
+      {
+        id: "ECO-01",
+        subject: "Economics",
+        category: "Social Sciences & Human Inquiry",
+        title: "Microeconomics & Consumer Equilibrium",
+        description: "Central problems of an economy, utility analysis, indifference curves, and budget lines.",
+        duration: "180 mins",
+        marks: "80 marks",
+        date: "Term Exam",
+        htmlFile: "exams/economics-term1.html",
+        pdfLink: "https://example.com/download/eco-term1-paper"
+      },
+      {
+        id: "ENG-01",
+        subject: "English",
+        category: "Language, Literature & Composition",
+        title: "Hornbill & Creative Writing Skills",
+        description: "Reading comprehension, unseen passages, literary extracts, and formal analytical composition.",
+        duration: "120 mins",
+        marks: "50 marks",
+        date: "Practice Set",
+        htmlFile: "exams/english-practice-1.html",
+        pdfLink: "https://example.com/download/english-set-1-pdf"
+      }
+    ];
+
+    /* Unified 1.5px Stroke Vector Icons (Lucide / Feather specification) */
+    const ICONS = {
+      All: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
+      History: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"></line><line x1="6" y1="18" x2="6" y2="11"></line><line x1="10" y1="18" x2="10" y2="11"></line><line x1="14" y1="18" x2="14" y2="11"></line><line x1="18" y1="18" x2="18" y2="11"></line><polygon points="12 2 20 7 4 7"></polygon></svg>`,
+      "Political Science": `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path><path d="M7 21h10"></path><path d="M12 3v18"></path><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"></path></svg>`,
+      Geography: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`,
+      Sociology: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`,
+      Psychology: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path><line x1="9" y1="21" x2="15" y2="21"></line></svg>`,
+      Economics: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>`,
+      English: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg>`,
+      ArrowRight: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`,
+      DownloadPdf: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`,
+      Moon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`,
+      Sun: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`
+    };
+
+    const SUBJECT_TONES = {
+      "History": "var(--tone-ochre)",
+      "Political Science": "var(--tone-navy)",
+      "Geography": "var(--tone-forest)",
+      "Sociology": "var(--tone-plum)",
+      "Psychology": "var(--tone-slate)",
+      "Economics": "var(--tone-teal)",
+      "English": "var(--tone-crimson)"
+    };
+
+    let activeSubject = "All";
+    let searchQuery = "";
+
+    const archiveContainer = document.getElementById("archiveContainer");
+    const subjectFilters = document.getElementById("subjectFilters");
+    const searchInput = document.getElementById("searchInput");
+    const totalExamsCount = document.getElementById("totalExamsCount");
+    const totalSubjectsCount = document.getElementById("totalSubjectsCount");
+
+    function initPortal() {
+      const uniqueSubjects = ["All", ...new Set(EXAMS_DATA.map(item => item.subject))];
+      totalExamsCount.textContent = EXAMS_DATA.length;
+      totalSubjectsCount.textContent = uniqueSubjects.length - 1;
+
+      renderFilterPills(uniqueSubjects);
+      renderExams();
+    }
+
+    function renderFilterPills(subjects) {
+      subjectFilters.innerHTML = subjects.map(sub => {
+        const icon = ICONS[sub] || ICONS.All;
+        const activeClass = sub === activeSubject ? "active" : "";
+        return `
+          <button class="filter-pill ${activeClass}" onclick="setSubjectFilter('${sub}')">
+            ${icon}
+            <span>${sub}</span>
+          </button>
+        `;
+      }).join("");
+    }
+
+    window.setSubjectFilter = function(subject) {
+      activeSubject = subject;
+      const uniqueSubjects = ["All", ...new Set(EXAMS_DATA.map(item => item.subject))];
+      renderFilterPills(uniqueSubjects);
+      renderExams();
+    };
+
+    function createCardHTML(exam, isFeatured = false) {
+      const tone = SUBJECT_TONES[exam.subject] || "var(--accent-primary)";
+      const icon = ICONS[exam.subject] || ICONS.All;
+      const hasPdf = exam.pdfLink && exam.pdfLink.trim() !== "";
+
+      return `
+        <article class="exam-card ${isFeatured ? 'card-featured' : ''}" style="--subject-tone: ${tone};">
+          <div class="card-body">
+            <div class="card-top">
+              <span class="subject-label">
+                ${icon}
+                <span>${exam.subject}</span>
+              </span>
+              <span class="exam-code">${exam.id}</span>
+            </div>
+            <h3 class="card-title">${exam.title}</h3>
+            <p class="card-desc">${exam.description}</p>
+          </div>
+
+          <div class="card-footer">
+            <div class="card-meta">
+              <span>${exam.duration}</span>
+              <span class="meta-dot">·</span>
+              <span>${exam.marks}</span>
+              <span class="meta-dot">·</span>
+              <span>${exam.date}</span>
+            </div>
+
+            <div class="card-actions">
+              <a href="${exam.htmlFile}" class="btn-primary">
+                <span>Take Exam</span>
+                ${ICONS.ArrowRight}
+              </a>
+              <a 
+                href="${hasPdf ? exam.pdfLink : '#'}" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                class="btn-icon ${!hasPdf ? 'btn-disabled' : ''}"
+                aria-label="Download PDF question paper"
+                title="${hasPdf ? 'Download Official Question Paper (PDF)' : 'PDF not available'}"
+              >
+                ${ICONS.DownloadPdf}
+              </a>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderExams() {
+      const filtered = EXAMS_DATA.filter(exam => {
+        const matchesSubject = activeSubject === "All" || exam.subject === activeSubject;
+        const matchesSearch = 
+          exam.title.toLowerCase().includes(searchQuery) ||
+          exam.subject.toLowerCase().includes(searchQuery) ||
+          exam.description.toLowerCase().includes(searchQuery) ||
+          exam.id.toLowerCase().includes(searchQuery);
+        return matchesSubject && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        archiveContainer.innerHTML = `
+          <div class="empty-state">
+            <h3>No matching examination papers</h3>
+            <p>Clear your search query or reset the discipline filter to view all papers.</p>
+          </div>
+        `;
+        return;
+      }
+
+      /* When viewing the full archive, group into two balanced disciplinary tiers */
+      if (activeSubject === "All" && searchQuery === "") {
+        const socialSciences = filtered.filter(e => e.category === "Social Sciences & Human Inquiry");
+        const languages = filtered.filter(e => e.category === "Language, Literature & Composition");
+
+        archiveContainer.innerHTML = `
+          <section class="discipline-section">
+            <div class="section-header">
+              <h2 class="section-title">Social Sciences &amp; Human Inquiry</h2>
+              <span class="section-count">${socialSciences.length} Papers</span>
+            </div>
+            <div class="exam-grid">
+              ${socialSciences.map(exam => createCardHTML(exam, false)).join("")}
+            </div>
+          </section>
+
+          <section class="discipline-section">
+            <div class="section-header">
+              <h2 class="section-title">Language, Literature &amp; Composition</h2>
+              <span class="section-count">${languages.length} Paper</span>
+            </div>
+            <div class="exam-grid">
+              ${languages.map(exam => createCardHTML(exam, true)).join("")}
+            </div>
+          </section>
+        `;
+      } else {
+        /* Filtered view: if only 1 card is returned, display it in the featured banner layout */
+        const useFeatured = filtered.length === 1;
+        archiveContainer.innerHTML = `
+          <section class="discipline-section">
+            <div class="section-header">
+              <h2 class="section-title">${activeSubject === "All" ? "Filtered Results" : activeSubject}</h2>
+              <span class="section-count">${filtered.length} ${filtered.length === 1 ? "Paper" : "Papers"}</span>
+            </div>
+            <div class="exam-grid">
+              ${filtered.map(exam => createCardHTML(exam, useFeatured)).join("")}
+            </div>
+          </section>
+        `;
+      }
+    }
+
+    searchInput.addEventListener("input", (e) => {
+      searchQuery = e.target.value.toLowerCase().trim();
+      renderExams();
+    });
+
+    /* Theme Toggle with LocalStorage Persistence */
+    const themeToggle = document.getElementById("themeToggle");
+    const themeIcon = document.getElementById("themeIcon");
+    const themeText = document.getElementById("themeText");
+
+    const savedTheme = localStorage.getItem("humanities_portal_theme") || "light";
+    setTheme(savedTheme);
+
+    themeToggle.addEventListener("click", () => {
+      const current = document.documentElement.getAttribute("data-theme");
+      const next = current === "dark" ? "light" : "dark";
+      setTheme(next);
+    });
+
+    function setTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      localStorage.setItem("humanities_portal_theme", theme);
+      if (theme === "dark") {
+        themeIcon.innerHTML = ICONS.Sun;
+        themeText.textContent = "Light Theme";
+      } else {
+        themeIcon.innerHTML = ICONS.Moon;
+        themeText.textContent = "Dark Theme";
+      }
+    }
+
+    initPortal();
+  </script>
+</body>
+</html>

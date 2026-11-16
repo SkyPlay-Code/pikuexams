@@ -4,10 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Agora — Class XI Humanities Assessment Archive</title>
+  <script>
+    (function() {
+      try {
+        var saved = localStorage.getItem("humanities_portal_theme");
+        var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        var theme = saved || (prefersDark ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+      } catch (e) {}
+    })();
+  </script>
   <!-- Editorial Serif (Newsreader) + Clean UI Sans (Plus Jakarta Sans) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
     :root {
@@ -34,6 +44,14 @@
       --tone-slate: #364958;
       --tone-teal: #1D5257;
       --tone-crimson: #7A2323;
+
+      /* Status Tones */
+      --status-completed-bg: rgba(35, 78, 60, 0.1);
+      --status-completed-fg: #234E3C;
+      --status-revise-bg: rgba(138, 90, 30, 0.12);
+      --status-revise-fg: #8A5A1E;
+      --status-opened-bg: rgba(30, 58, 95, 0.1);
+      --status-opened-fg: #1E3A5F;
 
       --shadow-sm: 0 1px 3px rgba(28, 30, 33, 0.04);
       --shadow-hover: 0 10px 24px -6px rgba(28, 30, 33, 0.08);
@@ -66,6 +84,13 @@
       --tone-teal: #6BB0B5;
       --tone-crimson: #D97E7E;
 
+      --status-completed-bg: rgba(107, 168, 139, 0.16);
+      --status-completed-fg: #6BA88B;
+      --status-revise-bg: rgba(212, 163, 89, 0.16);
+      --status-revise-fg: #D4A359;
+      --status-opened-bg: rgba(127, 163, 201, 0.16);
+      --status-opened-fg: #7FA3C9;
+
       --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
       --shadow-hover: 0 12px 28px -8px rgba(0, 0, 0, 0.5);
     }
@@ -86,6 +111,32 @@
       flex-direction: column;
       -webkit-font-smoothing: antialiased;
       transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Consistent Accessible Focus Outlines */
+    .brand:focus-visible,
+    .theme-btn:focus-visible,
+    .filter-pill:focus-visible,
+    .select-control:focus-visible,
+    .search-clear:focus-visible,
+    .status-chip:focus-visible,
+    .btn-primary:focus-visible,
+    .btn-icon:focus-visible,
+    .empty-reset-btn:focus-visible {
+      outline: 2px solid var(--accent-primary);
+      outline-offset: 2px;
     }
 
     /* Top Navigation */
@@ -109,6 +160,7 @@
       gap: 0.75rem;
       text-decoration: none;
       color: var(--text-primary);
+      border-radius: 4px;
     }
 
     .brand-title {
@@ -228,15 +280,21 @@
 
     .control-bar {
       display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
+      flex-direction: column;
+      gap: 0.6rem;
       background: var(--bg-secondary);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
-      padding: 0.6rem 0.75rem;
+      padding: 0.65rem 0.75rem;
       box-shadow: var(--shadow-sm);
+    }
+
+    .control-row-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
     }
 
     .filter-pills {
@@ -244,10 +302,12 @@
       flex-wrap: wrap;
       align-items: center;
       gap: 0.25rem;
+      flex: 1 1 auto;
+      min-width: 0;
     }
 
     .filter-pill {
-      padding: 0.42rem 0.8rem;
+      padding: 0.42rem 0.75rem;
       border-radius: var(--radius-sm);
       border: 1px solid transparent;
       background: transparent;
@@ -260,11 +320,19 @@
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .filter-pill svg {
       opacity: 0.7;
       transition: var(--transition);
+    }
+
+    .pill-count {
+      font-size: 0.72rem;
+      opacity: 0.72;
+      font-variant-numeric: tabular-nums;
     }
 
     .filter-pill:hover {
@@ -278,14 +346,80 @@
       font-weight: 600;
     }
 
-    .filter-pill.active svg {
+    .filter-pill.active svg,
+    .filter-pill.active .pill-count {
       opacity: 1;
+    }
+
+    .filter-divider {
+      width: 1px;
+      height: 18px;
+      background: var(--border-color);
+      margin: 0 0.2rem;
+      flex-shrink: 0;
+    }
+
+    .filter-pill.pill-unattempted {
+      border-color: var(--border-color);
+    }
+
+    .filter-pill.pill-unattempted.active {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: #FFFFFF;
+    }
+
+    [data-theme="dark"] .filter-pill.pill-unattempted.active {
+      color: var(--bg-primary);
+    }
+
+    .control-row-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      padding-top: 0.55rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .control-selects {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    .select-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .select-control {
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.42rem 0.65rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .select-control:hover {
+      border-color: var(--border-strong);
     }
 
     .search-wrapper {
       position: relative;
       min-width: 260px;
-      flex: 0 1 300px;
+      flex: 0 1 320px;
     }
 
     .search-icon {
@@ -299,7 +433,7 @@
 
     .search-input {
       width: 100%;
-      padding: 0.48rem 0.85rem 0.48rem 2.25rem;
+      padding: 0.46rem 2rem 0.46rem 2.25rem;
       font-family: inherit;
       font-size: 0.83rem;
       color: var(--text-primary);
@@ -308,6 +442,13 @@
       border-radius: var(--radius-sm);
       transition: var(--transition);
       outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .search-input::-webkit-search-cancel-button {
+      -webkit-appearance: none;
+      appearance: none;
     }
 
     .search-input::placeholder {
@@ -319,7 +460,34 @@
       background: var(--bg-secondary);
     }
 
-    /* Main Archive Content & Two-Tier Disciplinary Sections */
+    .search-clear {
+      position: absolute;
+      right: 0.45rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .search-clear:hover {
+      color: var(--text-primary);
+      background: var(--bg-subtle);
+    }
+
+    .search-clear[hidden] {
+      display: none;
+    }
+
+    /* Main Archive Content & Disciplinary Sections */
     .main-content {
       max-width: 1160px;
       width: 100%;
@@ -359,7 +527,7 @@
       font-weight: 500;
     }
 
-    /* 3-Column Balanced Grid for Social Sciences (6 cards = 3x2) */
+    /* 3-Column Balanced Grid */
     .exam-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -385,7 +553,7 @@
       border-color: var(--border-strong);
     }
 
-    /* Full-Width Featured/Language Banner Card (Solves 7th-card orphan) */
+    /* Full-Width Featured/Single-Result Banner Card */
     .exam-card.card-featured {
       grid-column: 1 / -1;
       display: grid;
@@ -398,20 +566,21 @@
 
     .card-featured .card-body {
       max-width: 680px;
-    }
-
-    .card-featured .card-desc {
-      margin-bottom: 0.65rem;
+      margin-bottom: 0;
     }
 
     .card-featured .card-footer {
       border-top: none;
       padding-top: 0;
       flex-direction: column;
-      align-items: flex-end;
+      align-items: stretch;
       justify-content: center;
       gap: 0.85rem;
       min-width: 240px;
+    }
+
+    .card-body {
+      margin-bottom: 1.25rem;
     }
 
     .card-top {
@@ -437,6 +606,12 @@
       stroke: var(--subject-tone, var(--accent-primary));
     }
 
+    .card-top-right {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
     .exam-code {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       font-size: 0.73rem;
@@ -451,14 +626,15 @@
       font-size: 1.3rem;
       font-weight: 500;
       color: var(--text-primary);
-      margin-bottom: 0.45rem;
+      margin-bottom: 0;
       line-height: 1.28;
     }
 
     .card-desc {
       font-size: 0.875rem;
       color: var(--text-secondary);
-      margin-bottom: 1.35rem;
+      margin-top: 0.45rem;
+      margin-bottom: 0;
       line-height: 1.55;
     }
 
@@ -466,8 +642,16 @@
       border-top: 1px solid var(--border-color);
       padding-top: 1rem;
       display: flex;
-       flex-direction: column;
-      gap: 0.9rem;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .card-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      flex-wrap: wrap;
     }
 
     /* Clean Understated Metadata Row */
@@ -483,6 +667,49 @@
 
     .meta-dot {
       color: var(--border-strong);
+    }
+
+    /* Subtle Attempt Status Toggle */
+    .status-chip {
+      font-family: inherit;
+      font-size: 0.71rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      padding: 0.18rem 0.5rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-color);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      flex-shrink: 0;
+    }
+
+    .status-chip:hover {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+      background: var(--bg-subtle);
+    }
+
+    .status-chip[data-status="opened"] {
+      background: var(--status-opened-bg);
+      color: var(--status-opened-fg);
+      border-color: transparent;
+    }
+
+    .status-chip[data-status="completed"] {
+      background: var(--status-completed-bg);
+      color: var(--status-completed-fg);
+      border-color: transparent;
+    }
+
+    .status-chip[data-status="revise"] {
+      background: var(--status-revise-bg);
+      color: var(--status-revise-fg);
+      border-color: transparent;
     }
 
     /* Streamlined Actions: Primary CTA + Subtle Icon Button for PDF */
@@ -517,6 +744,10 @@
       color: #FFFFFF;
     }
 
+    [data-theme="dark"] .btn-primary:hover {
+      color: var(--bg-primary);
+    }
+
     .btn-icon {
       display: inline-flex;
       align-items: center;
@@ -541,6 +772,7 @@
     .btn-disabled {
       opacity: 0.35;
       pointer-events: none;
+      cursor: default;
     }
 
     /* Empty State */
@@ -562,6 +794,30 @@
     .empty-state p {
       color: var(--text-muted);
       font-size: 0.88rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .empty-reset-btn {
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 0.55rem 1.15rem;
+      border-radius: var(--radius-sm);
+      background: var(--text-primary);
+      color: var(--bg-primary);
+      border: 1px solid var(--text-primary);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .empty-reset-btn:hover {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: #FFFFFF;
+    }
+
+    [data-theme="dark"] .empty-reset-btn:hover {
+      color: var(--bg-primary);
     }
 
     /* Institutional Footer */
@@ -595,6 +851,7 @@
         border-top: 1px solid var(--border-color);
         padding-top: 1rem;
         align-items: stretch;
+        min-width: 0;
       }
     }
 
@@ -602,21 +859,58 @@
       .masthead {
         padding: 2rem 1.25rem 1.5rem;
       }
-      .control-bar {
+      .control-row-top,
+      .control-row-bottom {
         flex-direction: column;
         align-items: stretch;
       }
+      .filter-pills {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 0.15rem;
+      }
+      .filter-pills::-webkit-scrollbar {
+        display: none;
+      }
       .search-wrapper {
+        min-width: 0;
+        width: 100%;
         flex: 1 1 auto;
+      }
+      .control-selects {
+        width: 100%;
+      }
+      .select-group {
+        flex: 1 1 140px;
+      }
+      .select-control {
+        width: 100%;
       }
       .exam-grid {
         grid-template-columns: 1fr;
       }
-      .brand-subtitle {
-        display: none;
-      }
+      .brand-subtitle,
       .brand-divider {
         display: none;
+      }
+    }
+
+    @media print {
+      .navbar .theme-btn,
+      .control-bar-wrapper,
+      .card-actions,
+      .status-chip {
+        display: none !important;
+      }
+      body {
+        background: #FFFFFF;
+        color: #000000;
+      }
+      .exam-card {
+        break-inside: avoid;
+        box-shadow: none;
       }
     }
   </style>
@@ -626,13 +920,13 @@
   <!-- Top Navigation -->
   <nav class="navbar">
     <div class="nav-container">
-      <a href="#" class="brand">
+      <a href="#" class="brand" id="brandReset">
         <span class="brand-title">Agora</span>
         <span class="brand-divider">/</span>
         <span class="brand-subtitle">Class XI Humanities Archive</span>
       </a>
-      <button class="theme-btn" id="themeToggle" aria-label="Toggle color theme">
-        <span id="themeIcon" style="display:inline-flex;align-items:center;"></span>
+      <button type="button" class="theme-btn" id="themeToggle" aria-label="Toggle color theme">
+        <span id="themeIcon" aria-hidden="true" style="display:inline-flex;align-items:center;"></span>
         <span id="themeText">Dark Theme</span>
       </button>
     </div>
@@ -649,38 +943,73 @@
     </div>
     <div class="masthead-meta">
       <div class="meta-stat">
-        <strong id="totalExamsCount">7</strong>
+        <strong id="totalExamsCount">—</strong>
         <span>Examination Papers</span>
       </div>
       <div class="meta-stat">
-        <strong id="totalSubjectsCount">7</strong>
+        <strong id="totalSubjectsCount">—</strong>
         <span>Core Disciplines</span>
       </div>
     </div>
   </header>
 
-  <!-- Cohesive Control Bar: Filter Pills + Search -->
+  <!-- Cohesive Control Bar: Filter Pills + Paper Type + Sort + Search -->
   <section class="control-bar-wrapper" aria-label="Filter and search examinations">
     <div class="control-bar">
-      <div class="filter-pills" id="subjectFilters">
-        <!-- Populated via JavaScript -->
+      <div class="control-row-top">
+        <div class="filter-pills" id="subjectFilters" role="group" aria-label="Filter by discipline or attempt status">
+          <!-- Populated via JavaScript -->
+        </div>
       </div>
-      <div class="search-wrapper">
-        <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        <input 
-          type="text" 
-          id="searchInput" 
-          class="search-input" 
-          placeholder="Filter by topic, title, or code..."
-        />
+
+      <div class="control-row-bottom">
+        <div class="control-selects">
+          <label class="select-group">
+            <span>Type</span>
+            <select id="paperTypeFilter" class="select-control" aria-label="Filter by paper type">
+              <option value="all">All Paper Types</option>
+              <option value="Chapter Test">Chapter Tests (2–2.5h · 60–70m)</option>
+              <option value="Unit Paper">Full-Syllabus / Unit Papers (3h · 80m)</option>
+            </select>
+          </label>
+          <label class="select-group">
+            <span>Sort</span>
+            <select id="sortSelect" class="select-control" aria-label="Sort examination papers">
+              <option value="default">Curriculum Order (ID)</option>
+              <option value="date-desc">Date (Newest First)</option>
+              <option value="date-asc">Date (Oldest First)</option>
+              <option value="marks-desc">Marks (High to Low)</option>
+              <option value="marks-asc">Marks (Low to High)</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="search-wrapper">
+          <svg class="search-icon" aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input 
+            type="search" 
+            id="searchInput" 
+            class="search-input" 
+            placeholder="Filter by topic, title, or code..."
+            aria-label="Filter examinations by topic, title, or code"
+          />
+          <button type="button" id="searchClearBtn" class="search-clear" aria-label="Clear search query" hidden>
+            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Main Two-Tier Disciplinary Archive -->
+  <div id="resultsAnnouncement" class="sr-only" aria-live="polite"></div>
+
+  <!-- Main Disciplinary Archive -->
   <main class="main-content" id="archiveContainer">
     <!-- Populated via JavaScript -->
   </main>
@@ -705,6 +1034,7 @@
         description: "Constituent Assembly debates, fundamental rights, institutional balance, and constitutional morality.",
         duration: "2.5 hours",
         marks: "70 marks",
+        assessmentType: "Chapter Test",
         date: "Oct 24, 2026",
         htmlFile: "Exams/polsci-1,2.html",
         pdfLink: "https://schoolchan.onrender.com/thread/18#p268"
@@ -717,6 +1047,7 @@
         description: "",
         duration: "3 hours",
         marks: "80 marks",
+        assessmentType: "Unit Paper",
         date: "Nov 01, 2026",
         htmlFile: "Exams/Polsc3_4-XI.html",
         pdfLink: "https://schoolchan.onrender.com/thread/29#273"
@@ -729,7 +1060,8 @@
         description: "",
         duration: "2.5 hours",
         marks: "70 marks",
-        date: "19th Oct, 2026",
+        assessmentType: "Chapter Test",
+        date: "Oct 19, 2026",
         htmlFile: "Exams/pol5.html",
         pdfLink: "https://schoolchan.onrender.com/thread/18#p259"
       },
@@ -741,7 +1073,8 @@
         description: "",
         duration: "2.5 hours",
         marks: "70 marks",
-        date: "17th Oct, 2026",
+        assessmentType: "Chapter Test",
+        date: "Oct 17, 2026",
         htmlFile: "Exams/pol6.html",
         pdfLink: "https://schoolchan.onrender.com/thread/18#p255"
       },
@@ -753,6 +1086,7 @@
         description: "",
         duration: "3 hours",
         marks: "80 marks",
+        assessmentType: "Unit Paper",
         date: "Nov 01, 2026",
         htmlFile: "Exams/Polsc7-XI.html",
         pdfLink: "https://schoolchan.onrender.com/thread/29#274"
@@ -765,6 +1099,7 @@
         description: "",
         duration: "3 hours",
         marks: "80 marks",
+        assessmentType: "Unit Paper",
         date: "Nov 07, 2026",
         htmlFile: "Exams/Polsc8-XI.html",
         pdfLink: "https://schoolchan.onrender.com/thread/29#275"
@@ -777,6 +1112,7 @@
         description: "",
         duration: "3 hours",
         marks: "80 marks",
+        assessmentType: "Unit Paper",
         date: "Nov 07, 2026",
         htmlFile: "Exams/Polsc9_10-XI.html",
         pdfLink: "https://schoolchan.onrender.com/thread/29#276"
@@ -789,6 +1125,7 @@
         description: "",
         duration: "3 hours",
         marks: "80 marks",
+        assessmentType: "Unit Paper",
         date: "Nov 07, 2026",
         htmlFile: "Exams/Polsc_2_1_2-XI.html",
         pdfLink: "https://schoolchan.onrender.com/thread/29#277"
@@ -801,6 +1138,7 @@
         description: "",
         duration: "3 hours",
         marks: "80 marks",
+        assessmentType: "Unit Paper",
         date: "Nov 07, 2026",
         htmlFile: "Exams/Polsc_2_3_4-XI.html",
         pdfLink: "https://schoolchan.onrender.com/thread/29#278"
@@ -813,6 +1151,7 @@
         description: "",
         duration: "3 hours",
         marks: "80 marks",
+        assessmentType: "Unit Paper",
         date: "Nov 07, 2026",
         htmlFile: "Exams/Polsc_2_5_6-XI.html",
         pdfLink: "https://schoolchan.onrender.com/thread/29#279"
@@ -825,7 +1164,8 @@
         description: "",
         duration: "2 hours",
         marks: "60 marks",
-        date: "Chapter Test",
+        assessmentType: "Chapter Test",
+        date: "",
         htmlFile: "Exams/His1-XI.html",
         pdfLink: "https://schoolchan.onrender.com/thread/29"
       },
@@ -837,7 +1177,8 @@
         description: "",
         duration: "3 hours",
         marks: "80 marks",
-        date: "Chapter Test",
+        assessmentType: "Unit Paper",
+        date: "",
         htmlFile: "Exams/His2-XI.html",
         pdfLink: "https://schoolchan.onrender.com/thread/29#p269"
       },
@@ -849,7 +1190,8 @@
         description: "",
         duration: "2 hours",
         marks: "70 marks",
-        date: "Chapter Test",
+        assessmentType: "Chapter Test",
+        date: "",
         htmlFile: "Exams/NULL",
         pdfLink: "https://schoolchan.onrender.com/thread/18#p254"
       },
@@ -861,7 +1203,8 @@
         description: "",
         duration: "3 hours",
         marks: "80 marks",
-        date: "Chapter Test",
+        assessmentType: "Unit Paper",
+        date: "",
         htmlFile: "Exams/His4-XI.html",
         pdfLink: "https://schoolchan.onrender.com/thread/29#p270"
       },
@@ -873,10 +1216,11 @@
         description: "",
         duration: "3 hours",
         marks: "80 marks",
-        date: "Chapter Test",
+        assessmentType: "Unit Paper",
+        date: "",
         htmlFile: "Exams/His5-XI.html",
         pdfLink: "https://schoolchan.onrender.com/thread/29#p272"
-      },
+      }
       // {
       //   id: "PSY-01",
       //   subject: "Psychology",
@@ -885,7 +1229,8 @@
       //   description: "Evolution of modern psychology, experimental vs. observational methods, and ethical guidelines.",
       //   duration: "90 mins",
       //   marks: "50 marks",
-      //   date: "Unit Test 2",
+      //   assessmentType: "Chapter Test",
+      //   date: "",
       //   htmlFile: "exams/psychology-test-1.html",
       //   pdfLink: "https://example.com/download/psych-enquiry-pdf"
       // },
@@ -897,7 +1242,8 @@
       //   description: "Central problems of an economy, utility analysis, indifference curves, and budget lines.",
       //   duration: "180 mins",
       //   marks: "80 marks",
-      //   date: "Term Exam",
+      //   assessmentType: "Unit Paper",
+      //   date: "",
       //   htmlFile: "exams/economics-term1.html",
       //   pdfLink: "https://example.com/download/eco-term1-paper"
       // },
@@ -909,7 +1255,8 @@
       //   description: "Reading comprehension, unseen passages, literary extracts, and formal analytical composition.",
       //   duration: "120 mins",
       //   marks: "50 marks",
-      //   date: "Practice Set",
+      //   assessmentType: "Chapter Test",
+      //   date: "",
       //   htmlFile: "exams/english-practice-1.html",
       //   pdfLink: "https://example.com/download/english-set-1-pdf"
       // }
@@ -917,23 +1264,26 @@
 
     /* Unified 1.5px Stroke Vector Icons (Lucide / Feather specification) */
     const ICONS = {
-      All: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
-      History: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"></line><line x1="6" y1="18" x2="6" y2="11"></line><line x1="10" y1="18" x2="10" y2="11"></line><line x1="14" y1="18" x2="14" y2="11"></line><line x1="18" y1="18" x2="18" y2="11"></line><polygon points="12 2 20 7 4 7"></polygon></svg>`,
-      "Political Science": `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path><path d="M7 21h10"></path><path d="M12 3v18"></path><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"></path></svg>`,
-      Geography: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`,
-      Sociology: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`,
-      Psychology: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path><line x1="9" y1="21" x2="15" y2="21"></line></svg>`,
-      Economics: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>`,
-      English: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg>`,
-      ArrowRight: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`,
-      DownloadPdf: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`,
-      Moon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`,
-      Sun: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`
+      All: `<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
+      History: `<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"></line><line x1="6" y1="18" x2="6" y2="11"></line><line x1="10" y1="18" x2="10" y2="11"></line><line x1="14" y1="18" x2="14" y2="11"></line><line x1="18" y1="18" x2="18" y2="11"></line><polygon points="12 2 20 7 4 7"></polygon></svg>`,
+      "Political Science": `<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path><path d="M7 21h10"></path><path d="M12 3v18"></path><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"></path></svg>`,
+      "Political Theory": `<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>`,
+      Geography: `<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`,
+      Sociology: `<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`,
+      Psychology: `<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path><line x1="9" y1="21" x2="15" y2="21"></line></svg>`,
+      Economics: `<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>`,
+      English: `<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg>`,
+      Unattempted: `<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle></svg>`,
+      ArrowRight: `<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`,
+      DownloadPdf: `<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`,
+      Moon: `<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`,
+      Sun: `<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`
     };
 
     const SUBJECT_TONES = {
       "History": "var(--tone-ochre)",
       "Political Science": "var(--tone-navy)",
+      "Political Theory": "var(--tone-plum)",
       "Geography": "var(--tone-forest)",
       "Sociology": "var(--tone-plum)",
       "Psychology": "var(--tone-slate)",
@@ -941,87 +1291,281 @@
       "English": "var(--tone-crimson)"
     };
 
+    const STATUS_STORAGE_KEY = "agora_exam_statuses_v1";
+    const STATUS_LABELS = {
+      unattempted: "Unattempted",
+      opened: "Opened",
+      completed: "Completed",
+      revise: "To Revise"
+    };
+    const STATUS_CYCLE = ["unattempted", "completed", "revise"];
+
+    let examStatuses = loadExamStatuses();
     let activeSubject = "All";
+    let onlyUnattempted = false;
+    let activePaperType = "all";
+    let activeSort = "default";
     let searchQuery = "";
 
     const archiveContainer = document.getElementById("archiveContainer");
     const subjectFilters = document.getElementById("subjectFilters");
+    const paperTypeFilter = document.getElementById("paperTypeFilter");
+    const sortSelect = document.getElementById("sortSelect");
     const searchInput = document.getElementById("searchInput");
+    const searchClearBtn = document.getElementById("searchClearBtn");
+    const brandReset = document.getElementById("brandReset");
+    const resultsAnnouncement = document.getElementById("resultsAnnouncement");
     const totalExamsCount = document.getElementById("totalExamsCount");
     const totalSubjectsCount = document.getElementById("totalSubjectsCount");
 
+    const uniqueSubjects = ["All", ...new Set(EXAMS_DATA.map(item => item.subject))];
+
+    function escapeHTML(value) {
+      if (value === null || value === undefined) return "";
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function loadExamStatuses() {
+      try {
+        const raw = localStorage.getItem(STATUS_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveExamStatuses() {
+      try {
+        localStorage.setItem(STATUS_STORAGE_KEY, JSON.stringify(examStatuses));
+      } catch (e) {}
+    }
+
+    function getExamStatus(id) {
+      return examStatuses[id] || "unattempted";
+    }
+
+    function readUrlState() {
+      const params = new URLSearchParams(window.location.search);
+      const sub = params.get("subject");
+      const unattempted = params.get("unattempted");
+      const type = params.get("type");
+      const sort = params.get("sort");
+      const q = params.get("q");
+
+      if (sub && uniqueSubjects.includes(sub)) {
+        activeSubject = sub;
+      }
+      if (unattempted === "1") {
+        onlyUnattempted = true;
+      }
+      if (type && ["all", "Chapter Test", "Unit Paper"].includes(type)) {
+        activePaperType = type;
+      }
+      if (sort && ["default", "date-desc", "date-asc", "marks-desc", "marks-asc"].includes(sort)) {
+        activeSort = sort;
+      }
+      if (q) {
+        searchQuery = q.toLowerCase().trim();
+        searchInput.value = q;
+      }
+    }
+
+    function syncUrlState() {
+      const params = new URLSearchParams();
+      if (activeSubject !== "All") params.set("subject", activeSubject);
+      if (onlyUnattempted) params.set("unattempted", "1");
+      if (activePaperType !== "all") params.set("type", activePaperType);
+      if (activeSort !== "default") params.set("sort", activeSort);
+      if (searchInput.value.trim() !== "") params.set("q", searchInput.value.trim());
+
+      const queryString = params.toString();
+      const newUrl = queryString ? `${window.location.pathname}?${queryString}` : window.location.pathname;
+      history.replaceState(null, "", newUrl);
+    }
+
+    function updateClearButton() {
+      searchClearBtn.hidden = searchInput.value.length === 0;
+    }
+
+    function resetAllFilters() {
+      activeSubject = "All";
+      onlyUnattempted = false;
+      activePaperType = "all";
+      activeSort = "default";
+      searchQuery = "";
+      searchInput.value = "";
+      paperTypeFilter.value = "all";
+      sortSelect.value = "default";
+      updateClearButton();
+      syncUrlState();
+      renderFilterPills();
+      renderExams();
+    }
+
     function initPortal() {
-      const uniqueSubjects = ["All", ...new Set(EXAMS_DATA.map(item => item.subject))];
       totalExamsCount.textContent = EXAMS_DATA.length;
       totalSubjectsCount.textContent = uniqueSubjects.length - 1;
 
-      renderFilterPills(uniqueSubjects);
+      readUrlState();
+      paperTypeFilter.value = activePaperType;
+      sortSelect.value = activeSort;
+      updateClearButton();
+
+      renderFilterPills();
       renderExams();
     }
 
-    function renderFilterPills(subjects) {
-      subjectFilters.innerHTML = subjects.map(sub => {
+    function renderFilterPills() {
+      const subjectCounts = EXAMS_DATA.reduce((acc, item) => {
+        acc[item.subject] = (acc[item.subject] || 0) + 1;
+        return acc;
+      }, {});
+      const unattemptedCount = EXAMS_DATA.filter(item => getExamStatus(item.id) === "unattempted").length;
+
+      const subjectButtonsHTML = uniqueSubjects.map(sub => {
         const icon = ICONS[sub] || ICONS.All;
-        const activeClass = sub === activeSubject ? "active" : "";
+        const isActive = sub === activeSubject;
+        const count = sub === "All" ? EXAMS_DATA.length : (subjectCounts[sub] || 0);
         return `
-          <button class="filter-pill ${activeClass}" onclick="setSubjectFilter('${sub}')">
+          <button
+            type="button"
+            class="filter-pill ${isActive ? "active" : ""}"
+            data-subject="${escapeHTML(sub)}"
+            aria-pressed="${isActive}"
+          >
             ${icon}
-            <span>${sub}</span>
+            <span>${escapeHTML(sub)}</span>
+            <span class="pill-count">(${count})</span>
           </button>
         `;
       }).join("");
+
+      const unattemptedHTML = `
+        <span class="filter-divider" aria-hidden="true"></span>
+        <button
+          type="button"
+          class="filter-pill pill-unattempted ${onlyUnattempted ? "active" : ""}"
+          data-filter-unattempted="true"
+          aria-pressed="${onlyUnattempted}"
+        >
+          ${ICONS.Unattempted}
+          <span>Unattempted</span>
+          <span class="pill-count">(${unattemptedCount})</span>
+        </button>
+      `;
+
+      subjectFilters.innerHTML = subjectButtonsHTML + unattemptedHTML;
     }
 
-    window.setSubjectFilter = function(subject) {
-      activeSubject = subject;
-      const uniqueSubjects = ["All", ...new Set(EXAMS_DATA.map(item => item.subject))];
-      renderFilterPills(uniqueSubjects);
-      renderExams();
-    };
+    function parseMarks(marksStr) {
+      const parsed = parseInt(marksStr, 10);
+      return Number.isNaN(parsed) ? 0 : parsed;
+    }
+
+    function parseDateTimestamp(dateStr) {
+      if (!dateStr || !dateStr.trim()) return null;
+      const ms = Date.parse(dateStr);
+      return Number.isNaN(ms) ? null : ms;
+    }
+
+    function sortExams(list) {
+      if (activeSort === "default") return list;
+
+      const copy = [...list];
+      if (activeSort === "marks-desc") {
+        return copy.sort((a, b) => parseMarks(b.marks) - parseMarks(a.marks));
+      }
+      if (activeSort === "marks-asc") {
+        return copy.sort((a, b) => parseMarks(a.marks) - parseMarks(b.marks));
+      }
+      if (activeSort === "date-desc" || activeSort === "date-asc") {
+        const dir = activeSort === "date-desc" ? -1 : 1;
+        return copy.sort((a, b) => {
+          const tA = parseDateTimestamp(a.date);
+          const tB = parseDateTimestamp(b.date);
+          if (tA === null && tB === null) return 0;
+          if (tA === null) return 1;
+          if (tB === null) return -1;
+          return (tA - tB) * dir;
+        });
+      }
+      return copy;
+    }
 
     function createCardHTML(exam, isFeatured = false) {
       const tone = SUBJECT_TONES[exam.subject] || "var(--accent-primary)";
       const icon = ICONS[exam.subject] || ICONS.All;
-      const hasPdf = exam.pdfLink && exam.pdfLink.trim() !== "";
+      const hasPdf = Boolean(exam.pdfLink && exam.pdfLink.trim() !== "");
+      const hasDesc = Boolean(exam.description && exam.description.trim() !== "");
+      const status = getExamStatus(exam.id);
+      const statusLabel = STATUS_LABELS[status] || STATUS_LABELS.unattempted;
+
+      const metaParts = [exam.duration, exam.marks, exam.assessmentType, exam.date]
+        .filter(part => part && part.trim() !== "")
+        .map(part => `<span>${escapeHTML(part)}</span>`)
+        .join(`<span class="meta-dot" aria-hidden="true">·</span>`);
+
+      const pdfButtonHTML = hasPdf
+        ? `<a
+            href="${escapeHTML(exam.pdfLink)}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-icon"
+            aria-label="Download PDF question paper for ${escapeHTML(exam.title)}"
+            title="Download Official Question Paper (PDF)"
+          >${ICONS.DownloadPdf}</a>`
+        : `<a
+            class="btn-icon btn-disabled"
+            aria-disabled="true"
+            tabindex="-1"
+            aria-label="PDF question paper not available"
+            title="PDF not available"
+          >${ICONS.DownloadPdf}</a>`;
 
       return `
-        <article class="exam-card ${isFeatured ? 'card-featured' : ''}" style="--subject-tone: ${tone};">
+        <article class="exam-card ${isFeatured ? "card-featured" : ""}" style="--subject-tone: ${tone};">
           <div class="card-body">
             <div class="card-top">
               <span class="subject-label">
                 ${icon}
-                <span>${exam.subject}</span>
+                <span>${escapeHTML(exam.subject)}</span>
               </span>
-              <span class="exam-code">${exam.id}</span>
+              <div class="card-top-right">
+                <span class="exam-code">${escapeHTML(exam.id)}</span>
+              </div>
             </div>
-            <h3 class="card-title">${exam.title}</h3>
-            <p class="card-desc">${exam.description}</p>
+            <h3 class="card-title">${escapeHTML(exam.title)}</h3>
+            ${hasDesc ? `<p class="card-desc">${escapeHTML(exam.description)}</p>` : ""}
           </div>
 
           <div class="card-footer">
-            <div class="card-meta">
-              <span>${exam.duration}</span>
-              <span class="meta-dot">·</span>
-              <span>${exam.marks}</span>
-              <span class="meta-dot">·</span>
-              <span>${exam.date}</span>
+            <div class="card-meta-row">
+              <div class="card-meta">
+                ${metaParts}
+              </div>
+              <button
+                type="button"
+                class="status-chip"
+                data-status-toggle="${escapeHTML(exam.id)}"
+                data-status="${escapeHTML(status)}"
+                aria-label="Paper status for ${escapeHTML(exam.id)}: ${escapeHTML(statusLabel)}. Click to change status."
+                title="Click to cycle status (Unattempted / Completed / To Revise)"
+              >
+                ${escapeHTML(statusLabel)}
+              </button>
             </div>
 
             <div class="card-actions">
-              <a href="${exam.htmlFile}" class="btn-primary">
+              <a href="${escapeHTML(exam.htmlFile)}" class="btn-primary" data-take-exam="${escapeHTML(exam.id)}">
                 <span>Take Exam</span>
                 ${ICONS.ArrowRight}
               </a>
-              <a 
-                href="${hasPdf ? exam.pdfLink : '#'}" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                class="btn-icon ${!hasPdf ? 'btn-disabled' : ''}"
-                aria-label="Download PDF question paper"
-                title="${hasPdf ? 'Download Official Question Paper (PDF)' : 'PDF not available'}"
-              >
-                ${ICONS.DownloadPdf}
-              </a>
+              ${pdfButtonHTML}
             </div>
           </div>
         </article>
@@ -1029,59 +1573,69 @@
     }
 
     function renderExams() {
-      const filtered = EXAMS_DATA.filter(exam => {
+      const filteredRaw = EXAMS_DATA.filter(exam => {
         const matchesSubject = activeSubject === "All" || exam.subject === activeSubject;
-        const matchesSearch = 
+        const matchesUnattempted = !onlyUnattempted || getExamStatus(exam.id) === "unattempted";
+        const matchesType = activePaperType === "all" || exam.assessmentType === activePaperType;
+        const matchesSearch =
+          searchQuery === "" ||
           exam.title.toLowerCase().includes(searchQuery) ||
           exam.subject.toLowerCase().includes(searchQuery) ||
           exam.description.toLowerCase().includes(searchQuery) ||
-          exam.id.toLowerCase().includes(searchQuery);
-        return matchesSubject && matchesSearch;
+          exam.id.toLowerCase().includes(searchQuery) ||
+          (exam.assessmentType && exam.assessmentType.toLowerCase().includes(searchQuery));
+        return matchesSubject && matchesUnattempted && matchesType && matchesSearch;
       });
+
+      const filtered = sortExams(filteredRaw);
 
       if (filtered.length === 0) {
         archiveContainer.innerHTML = `
           <div class="empty-state">
             <h3>No matching examination papers</h3>
             <p>Clear your search query or reset the discipline filter to view all papers.</p>
+            <button type="button" class="empty-reset-btn" id="resetFiltersBtn">Reset Filters</button>
           </div>
         `;
+        resultsAnnouncement.textContent = "No matching examination papers found.";
         return;
       }
 
-      /* When viewing the full archive, group into two balanced disciplinary tiers */
-      if (activeSubject === "All" && searchQuery === "") {
-        const socialSciences = filtered.filter(e => e.category === "Social Sciences & Human Inquiry");
-        const languages = filtered.filter(e => e.category === "Language, Literature & Composition");
+      resultsAnnouncement.textContent = `Showing ${filtered.length} ${filtered.length === 1 ? "examination paper" : "examination papers"}.`;
 
-        archiveContainer.innerHTML = `
-          <section class="discipline-section">
-            <div class="section-header">
-              <h2 class="section-title">Social Sciences &amp; Human Inquiry</h2>
-              <span class="section-count">${socialSciences.length} Papers</span>
-            </div>
-            <div class="exam-grid">
-              ${socialSciences.map(exam => createCardHTML(exam, false)).join("")}
-            </div>
-          </section>
+      const isDefaultUnfilteredView =
+        activeSubject === "All" &&
+        !onlyUnattempted &&
+        activePaperType === "all" &&
+        searchQuery === "";
 
-          <section class="discipline-section">
-            <div class="section-header">
-              <h2 class="section-title">Language, Literature &amp; Composition</h2>
-              <span class="section-count">${languages.length} Paper</span>
-            </div>
-            <div class="exam-grid">
-              ${languages.map(exam => createCardHTML(exam, true)).join("")}
-            </div>
-          </section>
-        `;
+      if (isDefaultUnfilteredView) {
+        const categories = [...new Set(filtered.map(e => e.category))];
+        archiveContainer.innerHTML = categories.map(cat => {
+          const group = filtered.filter(e => e.category === cat);
+          const useFeatured = group.length === 1;
+          return `
+            <section class="discipline-section">
+              <div class="section-header">
+                <h2 class="section-title">${escapeHTML(cat)}</h2>
+                <span class="section-count">${group.length} ${group.length === 1 ? "Paper" : "Papers"}</span>
+              </div>
+              <div class="exam-grid">
+                ${group.map(exam => createCardHTML(exam, useFeatured)).join("")}
+              </div>
+            </section>
+          `;
+        }).join("");
       } else {
-        /* Filtered view: if only 1 card is returned, display it in the featured banner layout */
         const useFeatured = filtered.length === 1;
+        let heading = activeSubject === "All" ? "Filtered Results" : activeSubject;
+        if (onlyUnattempted) {
+          heading = activeSubject === "All" ? "Unattempted Papers" : `${activeSubject} — Unattempted`;
+        }
         archiveContainer.innerHTML = `
           <section class="discipline-section">
             <div class="section-header">
-              <h2 class="section-title">${activeSubject === "All" ? "Filtered Results" : activeSubject}</h2>
+              <h2 class="section-title">${escapeHTML(heading)}</h2>
               <span class="section-count">${filtered.length} ${filtered.length === 1 ? "Paper" : "Papers"}</span>
             </div>
             <div class="exam-grid">
@@ -1092,9 +1646,96 @@
       }
     }
 
+    /* Event Delegation for Filter Pills */
+    subjectFilters.addEventListener("click", (e) => {
+      const subjectBtn = e.target.closest("[data-subject]");
+      if (subjectBtn) {
+        activeSubject = subjectBtn.dataset.subject;
+        syncUrlState();
+        renderFilterPills();
+        renderExams();
+        return;
+      }
+
+      const unattemptedBtn = e.target.closest("[data-filter-unattempted]");
+      if (unattemptedBtn) {
+        onlyUnattempted = !onlyUnattempted;
+        syncUrlState();
+        renderFilterPills();
+        renderExams();
+      }
+    });
+
+    /* Event Delegation for Archive Cards & Empty State */
+    archiveContainer.addEventListener("click", (e) => {
+      const resetBtn = e.target.closest("#resetFiltersBtn");
+      if (resetBtn) {
+        resetAllFilters();
+        return;
+      }
+
+      const statusBtn = e.target.closest("[data-status-toggle]");
+      if (statusBtn) {
+        const examId = statusBtn.dataset.statusToggle;
+        const current = getExamStatus(examId);
+        const currentIndex = STATUS_CYCLE.indexOf(current);
+        const nextStatus = currentIndex === -1
+          ? "completed"
+          : STATUS_CYCLE[(currentIndex + 1) % STATUS_CYCLE.length];
+
+        if (nextStatus === "unattempted") {
+          delete examStatuses[examId];
+        } else {
+          examStatuses[examId] = nextStatus;
+        }
+        saveExamStatuses();
+        renderFilterPills();
+        renderExams();
+        return;
+      }
+
+      const takeExamLink = e.target.closest("[data-take-exam]");
+      if (takeExamLink) {
+        const examId = takeExamLink.dataset.takeExam;
+        if (getExamStatus(examId) === "unattempted") {
+          examStatuses[examId] = "opened";
+          saveExamStatuses();
+        }
+      }
+    });
+
+    paperTypeFilter.addEventListener("change", (e) => {
+      activePaperType = e.target.value;
+      syncUrlState();
+      renderExams();
+    });
+
+    sortSelect.addEventListener("change", (e) => {
+      activeSort = e.target.value;
+      syncUrlState();
+      renderExams();
+    });
+
     searchInput.addEventListener("input", (e) => {
       searchQuery = e.target.value.toLowerCase().trim();
+      updateClearButton();
+      syncUrlState();
       renderExams();
+    });
+
+    searchClearBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      searchQuery = "";
+      updateClearButton();
+      syncUrlState();
+      renderExams();
+      searchInput.focus();
+    });
+
+    brandReset.addEventListener("click", (e) => {
+      e.preventDefault();
+      resetAllFilters();
+      window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
     /* Theme Toggle with LocalStorage Persistence */
@@ -1102,18 +1743,22 @@
     const themeIcon = document.getElementById("themeIcon");
     const themeText = document.getElementById("themeText");
 
-    const savedTheme = localStorage.getItem("humanities_portal_theme") || "light";
-    setTheme(savedTheme);
+    const initialTheme = document.documentElement.getAttribute("data-theme") || "light";
+    setTheme(initialTheme, false);
 
     themeToggle.addEventListener("click", () => {
       const current = document.documentElement.getAttribute("data-theme");
       const next = current === "dark" ? "light" : "dark";
-      setTheme(next);
+      setTheme(next, true);
     });
 
-    function setTheme(theme) {
+    function setTheme(theme, persist = true) {
       document.documentElement.setAttribute("data-theme", theme);
-      localStorage.setItem("humanities_portal_theme", theme);
+      if (persist) {
+        try {
+          localStorage.setItem("humanities_portal_theme", theme);
+        } catch (e) {}
+      }
       if (theme === "dark") {
         themeIcon.innerHTML = ICONS.Sun;
         themeText.textContent = "Light Theme";
